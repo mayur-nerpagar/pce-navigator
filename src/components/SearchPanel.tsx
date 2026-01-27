@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Search, X, MapPin, Navigation, ArrowLeft, Clock, Route } from 'lucide-react';
+import { Search, X, MapPin, Navigation, ArrowLeft, Clock, Route, Locate, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { campusLocations, categoryLabels, CampusLocation } from '@/data/campusLocations';
 import { RouteResult } from '@/utils/dijkstra';
+import { GeolocationState } from '@/hooks/useGeolocation';
 
 interface SearchPanelProps {
   sourceId: string;
@@ -15,6 +16,9 @@ interface SearchPanelProps {
   route: RouteResult | null;
   isExpanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
+  onUseMyLocation?: () => void;
+  gpsEnabled?: boolean;
+  userLocation?: GeolocationState;
 }
 
 export function SearchPanel({
@@ -28,6 +32,9 @@ export function SearchPanel({
   route,
   isExpanded,
   onExpandedChange,
+  onUseMyLocation,
+  gpsEnabled,
+  userLocation,
 }: SearchPanelProps) {
   const [activeInput, setActiveInput] = useState<'source' | 'destination' | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -183,10 +190,35 @@ export function SearchPanel({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
-                  className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
+
+            {/* Use My Location Button */}
+            {activeInput === 'source' && onUseMyLocation && (
+              <button
+                onClick={() => {
+                  onUseMyLocation();
+                  setActiveInput(null);
+                }}
+                className="w-full flex items-center gap-4 px-4 py-3 bg-primary/5 hover:bg-primary/10 transition-colors text-left border-b border-gray-200"
+              >
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  {userLocation?.isLoading ? (
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  ) : (
+                    <Locate className="w-5 h-5 text-primary" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="font-medium text-foreground">Use my current location</div>
+                  <div className="text-sm text-muted-foreground">
+                    {userLocation?.isLoading ? 'Getting location...' : 'GPS-based detection'}
+                  </div>
+                </div>
+              </button>
+            )}
 
             {/* Location List */}
             <div className="overflow-y-auto h-[calc(100%-80px)]">

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import { campusLocations, campusCenter, categoryColors, CampusLocation } from '@/data/campusLocations';
+import { CAMPUS_BOUNDS } from '@/data/campusGraph';
 import { RouteResult } from '@/utils/dijkstra';
+import { GeolocationState } from '@/hooks/useGeolocation';
 
 interface CampusMapProps {
   route: RouteResult | null;
@@ -9,6 +11,8 @@ interface CampusMapProps {
   destinationId: string | null;
   onLocationClick?: (location: CampusLocation) => void;
   isNavigating?: boolean;
+  userLocation?: GeolocationState;
+  onRecenter?: () => void;
 }
 
 // Custom marker icons like Google Maps
@@ -50,31 +54,60 @@ const createLocationMarker = (category: CampusLocation['category'], isSource: bo
   const color = categoryColors[category];
   return L.divIcon({
     html: `
-      <div class="w-3 h-3 rounded-full border-2 border-white shadow-md transition-transform hover:scale-125" 
+      <div class="w-4 h-4 rounded-full border-2 border-white shadow-lg transition-transform hover:scale-125" 
            style="background-color: ${color}"></div>
     `,
     className: 'custom-poi-marker',
-    iconSize: [12, 12],
-    iconAnchor: [6, 6],
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
   });
 };
 
-export function CampusMap({ route, sourceId, destinationId, onLocationClick, isNavigating }: CampusMapProps) {
+// Create user location marker (blue dot with accuracy circle)
+const createUserLocationMarker = () => {
+  return L.divIcon({
+    html: `
+      <div class="relative flex items-center justify-center">
+        <div class="absolute w-10 h-10 bg-blue-500/20 rounded-full animate-pulse"></div>
+        <div class="w-5 h-5 bg-blue-600 rounded-full border-3 border-white shadow-lg z-10">
+          <div class="absolute inset-0 bg-blue-600 rounded-full animate-ping opacity-50"></div>
+        </div>
+      </div>
+    `,
+    className: 'user-location-marker',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+};
+
+export function CampusMap({ route, sourceId, destinationId, onLocationClick, isNavigating, userLocation }: CampusMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const routeLayersRef = useRef<L.Layer[]>([]);
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const accuracyCircleRef = useRef<L.Circle | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
-  // Initialize map
+  // Initialize map with satellite view and campus bounds
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
+    // Campus boundary for restriction
+    const bounds = L.latLngBounds(
+      [CAMPUS_BOUNDS.south, CAMPUS_BOUNDS.west],
+      [CAMPUS_BOUNDS.north, CAMPUS_BOUNDS.east]
+    );
+
     const map = L.map(mapRef.current, {
       center: [campusCenter.lat, campusCenter.lng],
-      zoom: 17,
+      zoom: 18,
+      minZoom: 16,
+      maxZoom: 20,
       zoomControl: false,
       attributionControl: false,
+      maxBounds: bounds.pad(0.1), // Allow slight overflow
+      maxBoundsViscosity: 1.0, // Strict boundary enforcement
     });
 
     // Add zoom control to bottom right (like Google Maps)
@@ -83,18 +116,43 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
     // Add attribution to bottom left
     L.control.attribution({ position: 'bottomleft', prefix: '' }).addTo(map);
 
-    // Google Maps-like tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }).addTo(map);
+    // ESRI Satellite imagery (high quality, free)
+    const satelliteLayer = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: 'Tiles © Esri',
+        maxZoom: 20,
+      }
+    );
+
+    // Add satellite as base
+    satelliteLayer.addTo(map);
+
+    // Add labels overlay on top of satellite
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+      {
+        maxZoom: 20,
+        opacity: 0.8,
+      }
+    ).addTo(map);
+
+    // Add campus boundary outline
+    const boundaryRect = L.rectangle(bounds, {
+      color: '#4285f4',
+      weight: 3,
+      fill: false,
+      dashArray: '10, 5',
+      opacity: 0.6,
+    });
+    boundaryRect.addTo(map);
 
     mapInstanceRef.current = map;
     setMapReady(true);
 
-    // Force map to invalidate size after render
+    // Force fit to campus on load
     setTimeout(() => {
+      map.fitBounds(bounds, { padding: [20, 20] });
       map.invalidateSize();
     }, 100);
 
@@ -103,6 +161,54 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Update user location marker
+  useEffect(() => {
+    if (!mapInstanceRef.current || !mapReady) return;
+    const map = mapInstanceRef.current;
+
+    // Remove existing user marker
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+    if (accuracyCircleRef.current) {
+      accuracyCircleRef.current.remove();
+      accuracyCircleRef.current = null;
+    }
+
+    if (userLocation?.latitude && userLocation?.longitude) {
+      // Add accuracy circle
+      if (userLocation.accuracy) {
+        accuracyCircleRef.current = L.circle(
+          [userLocation.latitude, userLocation.longitude],
+          {
+            radius: userLocation.accuracy,
+            color: '#4285f4',
+            fillColor: '#4285f4',
+            fillOpacity: 0.1,
+            weight: 1,
+          }
+        );
+        accuracyCircleRef.current.addTo(map);
+      }
+
+      // Add user marker
+      userMarkerRef.current = L.marker(
+        [userLocation.latitude, userLocation.longitude],
+        {
+          icon: createUserLocationMarker(),
+          zIndexOffset: 2000,
+        }
+      );
+      userMarkerRef.current.addTo(map);
+
+      // If navigating, follow user
+      if (isNavigating) {
+        map.setView([userLocation.latitude, userLocation.longitude], 19, { animate: true });
+      }
+    }
+  }, [userLocation, mapReady, isNavigating]);
 
   // Add markers
   useEffect(() => {
@@ -126,21 +232,25 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
 
       // Google Maps-like popup
       marker.bindPopup(`
-        <div class="p-1 min-w-[180px]">
-          <h3 class="font-semibold text-gray-900 text-sm mb-1">${location.name}</h3>
-          <p class="text-xs text-gray-600 mb-2">${location.description || ''}</p>
+        <div class="p-2 min-w-[200px]">
+          <h3 class="font-bold text-gray-900 text-sm mb-1">${location.name}</h3>
+          <p class="text-xs text-gray-600 mb-3">${location.description || ''}</p>
           <div class="flex gap-2">
             <button onclick="window.setNavSource('${location.id}')" 
-                    class="flex-1 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors">
+                    class="flex-1 px-3 py-1.5 bg-blue-500 text-white text-xs font-medium rounded-full hover:bg-blue-600 transition-colors">
               Start here
             </button>
             <button onclick="window.setNavDest('${location.id}')"
-                    class="flex-1 px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors">
+                    class="flex-1 px-3 py-1.5 bg-green-500 text-white text-xs font-medium rounded-full hover:bg-green-600 transition-colors">
               Go here
             </button>
           </div>
         </div>
-      `, { className: 'custom-popup' });
+      `, { 
+        className: 'custom-popup',
+        closeButton: true,
+        autoPan: true,
+      });
 
       marker.on('click', () => {
         onLocationClick?.(location);
@@ -158,7 +268,11 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
     const map = mapInstanceRef.current;
 
     // Remove existing route layers
-    routeLayersRef.current.forEach(layer => layer.remove());
+    routeLayersRef.current.forEach(layer => {
+      if (map.hasLayer(layer)) {
+        layer.remove();
+      }
+    });
     routeLayersRef.current = [];
 
     if (!route) return;
@@ -167,8 +281,8 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
 
     // Outer glow/shadow (like Google Maps route shadow)
     const routeShadow = L.polyline(latlngs, {
-      color: '#1a73e8',
-      weight: 10,
+      color: '#000000',
+      weight: 12,
       opacity: 0.3,
       lineCap: 'round',
       lineJoin: 'round',
@@ -179,13 +293,24 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
     // Main route line (Google Maps blue)
     const routeLine = L.polyline(latlngs, {
       color: '#4285f4',
-      weight: 6,
+      weight: 7,
       opacity: 1,
       lineCap: 'round',
       lineJoin: 'round',
     });
     routeLine.addTo(map);
     routeLayersRef.current.push(routeLine);
+
+    // Inner highlight line
+    const routeHighlight = L.polyline(latlngs, {
+      color: '#88b4f5',
+      weight: 3,
+      opacity: 0.8,
+      lineCap: 'round',
+      lineJoin: 'round',
+    });
+    routeHighlight.addTo(map);
+    routeLayersRef.current.push(routeHighlight);
 
     // Add direction arrows along the route
     const addDirectionArrows = () => {
@@ -203,14 +328,14 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
         const arrowIcon = L.divIcon({
           html: `
             <div class="flex items-center justify-center" style="transform: rotate(${angle}deg)">
-              <svg class="w-4 h-4 text-white drop-shadow" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
               </svg>
             </div>
           `,
           className: 'direction-arrow',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
         });
         
         const arrowMarker = L.marker([midLat, midLng], { icon: arrowIcon, interactive: false });
@@ -221,24 +346,36 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
     
     addDirectionArrows();
 
-    // Fit bounds with padding
-    const bounds = L.latLngBounds(latlngs);
-    map.fitBounds(bounds, { 
-      padding: [80, 80],
-      maxZoom: 18,
-    });
-
-  }, [route, mapReady]);
-
-  // Handle navigation mode - tilt and focus
-  useEffect(() => {
-    if (!mapInstanceRef.current || !isNavigating || !sourceId) return;
-    
-    const source = campusLocations.find(l => l.id === sourceId);
-    if (source) {
-      mapInstanceRef.current.setView([source.lat, source.lng], 19, { animate: true });
+    // Fit bounds with padding (only if not navigating)
+    if (!isNavigating) {
+      const bounds = L.latLngBounds(latlngs);
+      map.fitBounds(bounds, { 
+        padding: [100, 100],
+        maxZoom: 19,
+      });
     }
-  }, [isNavigating, sourceId]);
+
+  }, [route, mapReady, isNavigating]);
+
+  // Handle navigation mode - follow source/user location
+  useEffect(() => {
+    if (!mapInstanceRef.current || !isNavigating) return;
+    
+    // If we have user location, center on that
+    if (userLocation?.latitude && userLocation?.longitude) {
+      mapInstanceRef.current.setView(
+        [userLocation.latitude, userLocation.longitude], 
+        19, 
+        { animate: true }
+      );
+    } else if (sourceId) {
+      // Otherwise center on source
+      const source = campusLocations.find(l => l.id === sourceId);
+      if (source) {
+        mapInstanceRef.current.setView([source.lat, source.lng], 19, { animate: true });
+      }
+    }
+  }, [isNavigating, sourceId, userLocation?.latitude, userLocation?.longitude]);
 
   return (
     <div 
