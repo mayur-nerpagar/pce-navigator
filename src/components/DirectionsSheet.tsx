@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
-import { ChevronUp, ChevronDown, Navigation, Clock, Route, MapPin, ArrowUp, ArrowUpRight, ArrowRight, ArrowDownRight, ArrowDown, ArrowDownLeft, ArrowLeft, ArrowUpLeft, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronUp, ChevronDown, Navigation, Clock, Route, MapPin, ArrowUp, ArrowUpRight, ArrowRight, ArrowDownRight, ArrowDown, ArrowDownLeft, ArrowLeft, ArrowUpLeft, X, Navigation2 } from 'lucide-react';
 import { RouteResult } from '@/utils/dijkstra';
 import { campusLocations } from '@/data/campusLocations';
+import { GeolocationState } from '@/hooks/useGeolocation';
 
 interface DirectionsSheetProps {
   route: RouteResult | null;
@@ -10,6 +11,7 @@ interface DirectionsSheetProps {
   destinationId: string | null;
   onClose: () => void;
   isNavigating: boolean;
+  userLocation?: GeolocationState;
 }
 
 const getDirectionIcon = (instruction: string) => {
@@ -25,7 +27,7 @@ const getDirectionIcon = (instruction: string) => {
   return Navigation;
 };
 
-export function DirectionsSheet({ route, sourceId, destinationId, onClose, isNavigating }: DirectionsSheetProps) {
+export function DirectionsSheet({ route, sourceId, destinationId, onClose, isNavigating, userLocation }: DirectionsSheetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
   const sourceName = campusLocations.find(l => l.id === sourceId)?.name;
@@ -83,18 +85,24 @@ export function DirectionsSheet({ route, sourceId, destinationId, onClose, isNav
 
       {/* Current Direction Card (when navigating) */}
       {isNavigating && route.directions.length > 0 && (
-        <div className="mx-4 mb-4 p-4 bg-blue-500 rounded-xl text-white">
+        <div className="mx-4 mb-4 p-4 bg-primary rounded-xl text-primary-foreground">
           <div className="flex items-center gap-4">
             {(() => {
               const Icon = getDirectionIcon(route.directions[0].instruction);
               return <Icon className="w-8 h-8" />;
             })()}
-            <div>
+            <div className="flex-1">
               <div className="font-semibold text-lg">{route.directions[0].instruction}</div>
               {route.directions[0].distance > 0 && (
-                <div className="text-blue-100 text-sm">{route.directions[0].distance}m</div>
+                <div className="opacity-80 text-sm">{route.directions[0].distance}m</div>
               )}
             </div>
+            {userLocation?.latitude && (
+              <div className="flex items-center gap-1 text-sm opacity-80">
+                <Navigation2 className="w-4 h-4" />
+                <span>Live</span>
+              </div>
+            )}
           </div>
         </div>
       )}
