@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { CampusMap } from '@/components/CampusMap';
 import { SearchPanel } from '@/components/SearchPanel';
 import { DirectionsSheet } from '@/components/DirectionsSheet';
-import { findShortestPath, RouteResult } from '@/utils/dijkstra';
+import { findShortestPath, findPathFromPosition, RouteResult } from '@/utils/dijkstra';
 import { CampusLocation, campusLocations } from '@/data/campusLocations';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +18,7 @@ const Index = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [gpsEnabled, setGpsEnabled] = useState(false);
   const { toast } = useToast();
+  const lastRerouteRef = useRef<number>(0);
 
   // GPS tracking
   const userLocation = useGeolocation(gpsEnabled || isNavigating);
@@ -31,6 +32,36 @@ const Index = () => {
       setRoute(null);
     }
   }, [sourceId, destinationId]);
+
+  // Live GPS rerouting - recalculate route from current position when navigating
+  useEffect(() => {
+    if (!isNavigating || !destinationId || !userLocation.latitude || !userLocation.longitude) {
+      return;
+    }
+
+    // Throttle rerouting to once every 3 seconds
+    const now = Date.now();
+    if (now - lastRerouteRef.current < 3000) {
+      return;
+    }
+    lastRerouteRef.current = now;
+
+    // Only reroute if user is inside campus
+    if (!userLocation.isInsideCampus) {
+      return;
+    }
+
+    // Calculate new route from current GPS position
+    const newRoute = findPathFromPosition(
+      userLocation.latitude,
+      userLocation.longitude,
+      destinationId
+    );
+
+    if (newRoute && newRoute.coordinates.length > 0) {
+      setRoute(newRoute);
+    }
+  }, [isNavigating, destinationId, userLocation.latitude, userLocation.longitude, userLocation.isInsideCampus]);
 
   // Global functions for map popup buttons
   useEffect(() => {
