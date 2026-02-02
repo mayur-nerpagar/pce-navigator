@@ -12,12 +12,12 @@ export interface GeolocationState {
   isInsideCampus: boolean;
 }
 
-// Campus boundary (approximate)
+// Campus boundary (extended for all locations including back gate)
 const CAMPUS_BOUNDS = {
   north: 21.1050,
-  south: 21.1005,
-  east: 79.0105,
-  west: 79.0030,
+  south: 21.0985,
+  east: 79.0200,
+  west: 79.0025,
 };
 
 export function useGeolocation(enabled: boolean = false) {

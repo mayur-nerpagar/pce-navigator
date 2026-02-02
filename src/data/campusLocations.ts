@@ -8,31 +8,31 @@ export interface CampusLocation {
   icon?: string;
 }
 
+// Updated with exact coordinates from GeoJSON
 export const campusLocations: CampusLocation[] = [
-  { id: 'main-gate', name: 'PCE Main Gate', lat: 21.103063, lng: 79.004020, category: 'gate', description: 'Main entrance to the campus' },
-  { id: 'fy-canteen', name: 'First Year Canteen', lat: 21.103954, lng: 79.005062, category: 'amenity', description: 'Canteen for first year students' },
-  { id: 'civil-electrical', name: 'Civil/Electrical', lat: 21.103659, lng: 79.005430, category: 'academic', description: 'Civil and Electrical Engineering Department' },
-  { id: 'fy-building', name: 'First Year Building', lat: 21.103415, lng: 79.005001, category: 'academic', description: 'First Year classrooms and labs' },
-  { id: 'swimming-pool', name: 'Swimming Pool', lat: 21.103705, lng: 79.006245, category: 'recreation', description: 'Campus swimming pool' },
-  { id: 'sports-building', name: 'Sports Building', lat: 21.102051, lng: 79.004304, category: 'recreation', description: 'Indoor sports facility' },
-  { id: 'first-ground', name: 'First Ground', lat: 21.102249, lng: 79.004838, category: 'recreation', description: 'Main sports ground' },
-  { id: 'pce-lake', name: 'PCE Lake', lat: 21.102662, lng: 79.006276, category: 'recreation', description: 'Beautiful campus lake' },
-  { id: 'it-garden', name: 'IT Garden', lat: 21.101866, lng: 79.006795, category: 'recreation', description: 'Garden near IT department' },
-  { id: 'it-auditorium', name: 'IT Auditorium', lat: 21.101265, lng: 79.005897, category: 'academic', description: 'IT Department Auditorium' },
-  { id: 'it-cs-ct', name: 'IT/CS/CT Department', lat: 21.101590, lng: 79.006817, category: 'academic', description: 'Information Technology, Computer Science & Computer Technology' },
-  { id: 'saraswati-temple', name: 'Saraswati Temple', lat: 21.101881, lng: 79.005989, category: 'religious', description: 'Campus Saraswati Temple' },
-  { id: 'library', name: 'Library', lat: 21.101417, lng: 79.007840, category: 'academic', description: 'Central Library' },
-  { id: 'aids-iot-robotics', name: 'AIDS/IOT/Robotics', lat: 21.101714, lng: 79.007636, category: 'academic', description: 'AI & Data Science, IoT, Robotics Department' },
-  { id: 'main-canteen', name: 'Main Canteen', lat: 21.102479, lng: 79.007738, category: 'amenity', description: 'Main campus canteen' },
-  { id: 'ee-etc-aero', name: 'EE/ETC/AERO', lat: 21.102353, lng: 79.007597, category: 'academic', description: 'Electronics, ETC & Aerospace Engineering' },
-  { id: 'mahadev-temple', name: 'Mahadev Temple', lat: 21.103592, lng: 79.007413, category: 'religious', description: 'Campus Mahadev Temple' },
-  { id: 'mechanical-tnp', name: 'Mechanical & T&P', lat: 21.101812, lng: 79.009012, category: 'academic', description: 'Mechanical Engineering & Training and Placement' },
-  { id: 'admin-section', name: 'Admin Section', lat: 21.101874, lng: 79.009377, category: 'admin', description: 'Administrative offices' },
-  { id: 'mechanical-ground', name: 'Mechanical Ground', lat: 21.101601, lng: 79.009004, category: 'recreation', description: 'Ground near Mechanical department' },
-  { id: 'mba-bba', name: 'MBA/BBA', lat: 21.102040, lng: 79.008184, category: 'academic', description: 'MBA and BBA Department' },
+  { id: 'main-gate', name: 'PCE Main Gate', lat: 21.103110911291367, lng: 79.00396776638746, category: 'gate', description: 'Main entrance to the campus' },
+  { id: 'fy-canteen', name: 'First Year Canteen', lat: 21.103592922116718, lng: 79.00497359929443, category: 'amenity', description: 'Canteen for first year students' },
+  { id: 'fy-building', name: 'First Year/Electrical', lat: 21.103568136555268, lng: 79.00550028461976, category: 'academic', description: 'First Year and Electrical Engineering' },
+  { id: 'swimming-pool', name: 'Swimming Pool', lat: 21.103691514560182, lng: 79.00621597841439, category: 'recreation', description: 'Campus swimming pool' },
+  { id: 'first-ground', name: 'PCE Ground', lat: 21.10212606112998, lng: 79.00475485989352, category: 'recreation', description: 'Main sports ground' },
+  { id: 'pce-lake', name: 'PCE Lake', lat: 21.10260251067298, lng: 79.00628834818463, category: 'recreation', description: 'Beautiful campus lake' },
+  { id: 'saraswati-temple', name: 'Saraswati Temple', lat: 21.101862982198668, lng: 79.00590154936697, category: 'religious', description: 'Campus Saraswati Temple' },
+  { id: 'it-auditorium', name: 'IT Auditorium', lat: 21.101254904551723, lng: 79.00602560741709, category: 'academic', description: 'IT Department Auditorium' },
+  { id: 'it-cs-ct', name: 'IT/CS/CT Department', lat: 21.10133279965447, lng: 79.00681498300474, category: 'academic', description: 'Information Technology, Computer Science & Computer Technology' },
+  { id: 'library', name: 'Library', lat: 21.101448921880618, lng: 79.00760069032157, category: 'academic', description: 'Central Library' },
+  { id: 'aids-iot-robotics', name: 'AIDS/IOT/Robotics', lat: 21.10188370173887, lng: 79.00761304644965, category: 'academic', description: 'AI & Data Science, IoT, Robotics Department' },
+  { id: 'ee-etc-aero', name: 'EE/ETC/AERO', lat: 21.10220816542497, lng: 79.00765651969704, category: 'academic', description: 'Electronics, ETC & Aerospace Engineering' },
+  { id: 'main-canteen', name: 'PCE Canteen', lat: 21.10267168374763, lng: 79.00759441505727, category: 'amenity', description: 'Main campus canteen' },
+  { id: 'mba-bba', name: 'MBA/BBA', lat: 21.102029629915833, lng: 79.00835969483671, category: 'academic', description: 'MBA and BBA Department' },
+  { id: 'mechanical-tnp', name: 'Mechanical/T&P/Admin', lat: 21.10192817022464, lng: 79.00895179186142, category: 'academic', description: 'Mechanical Engineering, Training & Placement, Admin' },
+  { id: 'mechanical-ground', name: 'Mechanical Ground', lat: 21.101611730007008, lng: 79.00906472024741, category: 'recreation', description: 'Ground near Mechanical department' },
+  { id: 'architecture', name: 'Architecture Building', lat: 21.101015444452983, lng: 79.01330949015278, category: 'academic', description: 'Architecture Department' },
+  { id: 'pce-auditorium', name: 'PCE Auditorium', lat: 21.0993197482492, lng: 79.01483767658368, category: 'academic', description: 'Main college auditorium' },
+  { id: 'chemical', name: 'Chemical Department', lat: 21.099370478994345, lng: 79.01587686728067, category: 'academic', description: 'Chemical Engineering Department' },
+  { id: 'back-gate', name: 'PCE Back Gate', lat: 21.099566542721902, lng: 79.01908506102444, category: 'gate', description: 'Back entrance to the campus' },
 ];
 
-export const campusCenter = { lat: 21.102400, lng: 79.006500 };
+export const campusCenter = { lat: 21.1015, lng: 79.0100 };
 
 export const categoryColors: Record<CampusLocation['category'], string> = {
   gate: '#1e3a5f',

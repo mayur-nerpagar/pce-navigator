@@ -157,10 +157,10 @@ export function haversineDistance(
   return R * c;
 }
 
-// Campus boundary for map restriction
+// Campus boundary for map restriction (extended for all locations)
 export const CAMPUS_BOUNDS = {
   north: 21.1050,
-  south: 21.1000,
-  east: 79.0105,
+  south: 21.0985,
+  east: 79.0200,
   west: 79.0025,
 };
