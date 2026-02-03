@@ -54,12 +54,20 @@ const createLocationMarker = (category: CampusLocation['category'], isSource: bo
   const color = categoryColors[category];
   return L.divIcon({
     html: `
-      <div class="w-4 h-4 rounded-full border-2 border-white shadow-lg transition-transform hover:scale-125" 
-           style="background-color: ${color}"></div>
+      <div class="flex flex-col items-center">
+        <div class="w-7 h-7 rounded-full border-2 border-white shadow-lg flex items-center justify-center transform -translate-y-3"
+             style="background-color: ${color}">
+          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="w-1.5 h-1.5 rounded-full shadow-md -mt-2.5"
+             style="background-color: ${color}"></div>
+      </div>
     `,
     className: 'custom-poi-marker',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
+    iconSize: [28, 36],
+    iconAnchor: [14, 36],
   });
 };
 
