@@ -63,6 +63,24 @@ const createLocationMarker = (category: CampusLocation['category'], isSource: bo
   });
 };
 
+// Create a label marker for location names
+const createLabelMarker = (name: string, category: CampusLocation['category']) => {
+  const color = categoryColors[category];
+  return L.divIcon({
+    html: `
+      <div class="pointer-events-none whitespace-nowrap">
+        <div class="px-2 py-0.5 rounded text-xs font-semibold shadow-lg border border-white/50"
+             style="background-color: ${color}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+          ${name}
+        </div>
+      </div>
+    `,
+    className: 'location-label',
+    iconSize: [0, 0],
+    iconAnchor: [-10, 8],
+  });
+};
+
 // Create user location marker (blue dot with accuracy circle)
 const createUserLocationMarker = () => {
   return L.divIcon({
@@ -258,6 +276,15 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
 
       marker.addTo(map);
       markersRef.current.push(marker);
+
+      // Add label marker for each location (visible name on map)
+      const labelMarker = L.marker([location.lat, location.lng], {
+        icon: createLabelMarker(location.name, location.category),
+        interactive: false,
+        zIndexOffset: -100,
+      });
+      labelMarker.addTo(map);
+      markersRef.current.push(labelMarker);
     });
   }, [mapReady, sourceId, destinationId, onLocationClick]);
 
