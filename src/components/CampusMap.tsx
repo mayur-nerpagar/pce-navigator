@@ -54,25 +54,12 @@ const createLocationMarker = (category: CampusLocation['category'], isSource: bo
   const color = categoryColors[category];
   return L.divIcon({
     html: `
-      <div class="flex flex-col items-center">
-        <div class="relative">
-          <svg class="w-8 h-10 drop-shadow-lg" viewBox="0 0 24 30" fill="none">
-            <path d="M12 0C5.373 0 0 5.373 0 12c0 9 12 18 12 18s12-9 12-18c0-6.627-5.373-12-12-12z" fill="${color}"/>
-            <path d="M12 0C5.373 0 0 5.373 0 12c0 9 12 18 12 18s12-9 12-18c0-6.627-5.373-12-12-12z" fill="url(#shine)" fill-opacity="0.3"/>
-            <circle cx="12" cy="11" r="5" fill="white"/>
-            <defs>
-              <linearGradient id="shine" x1="0" y1="0" x2="24" y2="30">
-                <stop offset="0%" stop-color="white"/>
-                <stop offset="100%" stop-color="transparent"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      </div>
+      <div class="w-4 h-4 rounded-full border-2 border-white shadow-lg transition-transform hover:scale-125" 
+           style="background-color: ${color}"></div>
     `,
     className: 'custom-poi-marker',
-    iconSize: [32, 40],
-    iconAnchor: [16, 40],
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
   });
 };
 
@@ -90,7 +77,7 @@ const createLabelMarker = (name: string, category: CampusLocation['category']) =
     `,
     className: 'location-label',
     iconSize: [0, 0],
-    iconAnchor: [-12, 50], // Position below the pin icon
+    iconAnchor: [-10, 8],
   });
 };
 
