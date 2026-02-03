@@ -109,7 +109,7 @@ export function buildRoadGraph(): { graph: Graph; nodes: Map<string, GraphNode> 
     });
     
     // Connect location to nearest road point (bidirectional)
-    if (nearestRoadNodeId && nearestDistance < 200) { // Max 200m connection
+    if (nearestRoadNodeId && nearestDistance < 500) { // Max 500m connection for all buildings
       const nearestNode = nodes.get(nearestRoadNodeId)!;
       
       const locEdges = graph.get(locationNodeId) || [];

@@ -62,6 +62,7 @@ export const roadSegments: RoadSegment[] = [
     coordinates: [
       { lng: 79.00826876898441, lat: 21.101151816102572 },
       { lng: 79.00867963072085, lat: 21.101183758760754 },
+      { lng: 79.00895179186142, lat: 21.10192817022464 }, // Mechanical building exact
       { lng: 79.0096915679602, lat: 21.10151028331353 },
       { lng: 79.00998069288522, lat: 21.101570619293284 },
     ],
@@ -94,7 +95,7 @@ export const roadSegments: RoadSegment[] = [
       { lng: 79.0167199379656, lat: 21.09967655942279 },
       { lng: 79.01671285646194, lat: 21.099557638270937 },
       { lng: 79.01654290037897, lat: 21.099412290066937 },
-      { lng: 79.01644375933256, lat: 21.099362739510013 },
+      { lng: 79.01587686728067, lat: 21.099370478994345 }, // Chemical exact location
     ],
   },
   // Auditorium branch
@@ -159,6 +160,7 @@ export const roadSegments: RoadSegment[] = [
   {
     id: 'road-library-3',
     coordinates: [
+      { lng: 79.00760069032157, lat: 21.101448921880618 }, // Library exact location
       { lng: 79.00785305084935, lat: 21.101401228988507 },
       { lng: 79.00855763412471, lat: 21.101442696480177 },
     ],
