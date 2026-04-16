@@ -300,7 +300,7 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
       labelMarker.addTo(map);
       markersRef.current.push(labelMarker);
     });
-  }, [mapReady, sourceId, destinationId, onLocationClick]);
+  }, [mapReady, sourceId, destinationId, onLocationClick, activeFilters]);
 
   // Draw route like Google Maps
   useEffect(() => {
