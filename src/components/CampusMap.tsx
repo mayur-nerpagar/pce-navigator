@@ -13,6 +13,7 @@ interface CampusMapProps {
   isNavigating?: boolean;
   userLocation?: GeolocationState;
   onRecenter?: () => void;
+  activeFilters?: CampusLocation['category'][];
 }
 
 // Custom marker icons like Google Maps
@@ -106,7 +107,7 @@ const createUserLocationMarker = () => {
   });
 };
 
-export function CampusMap({ route, sourceId, destinationId, onLocationClick, isNavigating, userLocation }: CampusMapProps) {
+export function CampusMap({ route, sourceId, destinationId, onLocationClick, isNavigating, userLocation, activeFilters = [] }: CampusMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -246,8 +247,13 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    // Add markers for each location
-    campusLocations.forEach(location => {
+    // Filter locations based on active filters
+    const visibleLocations = activeFilters.length === 0 
+      ? campusLocations 
+      : campusLocations.filter(loc => activeFilters.includes(loc.category));
+
+    // Add markers for each visible location
+    visibleLocations.forEach(location => {
       const isSource = location.id === sourceId;
       const isDestination = location.id === destinationId;
       
@@ -294,7 +300,7 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
       labelMarker.addTo(map);
       markersRef.current.push(labelMarker);
     });
-  }, [mapReady, sourceId, destinationId, onLocationClick]);
+  }, [mapReady, sourceId, destinationId, onLocationClick, activeFilters]);
 
   // Draw route like Google Maps
   useEffect(() => {

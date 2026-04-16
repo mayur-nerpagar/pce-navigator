@@ -233,7 +233,7 @@ export const geoJsonLocations: LocationPoint[] = [
   { id: 'swimming-pool', name: 'Swimming Pool', lat: 21.103691514560182, lng: 79.00621597841439 },
   { id: 'main-gate', name: 'PCE Main Gate', lat: 21.103110911291367, lng: 79.00396776638746 },
   { id: 'library', name: 'Library', lat: 21.101400, lng: 79.007654 },
-  { id: 'aids-iot-robotics', name: 'AIDS', lat: 21.10188370173887, lng: 79.00761304644965 },
+  { id: 'aids', name: 'AIDS', lat: 21.10188370173887, lng: 79.00761304644965 },
   { id: 'ee-etc-aero', name: 'AERO/ETC/EC', lat: 21.10220816542497, lng: 79.00765651969704 },
   { id: 'main-canteen', name: 'PCE Canteen', lat: 21.10267168374763, lng: 79.00759441505727 },
   { id: 'fy-canteen', name: '1st Year Canteen', lat: 21.103592922116718, lng: 79.00497359929443 },
@@ -247,6 +247,17 @@ export const geoJsonLocations: LocationPoint[] = [
   { id: 'pce-lake', name: 'PCE Lake', lat: 21.10260251067298, lng: 79.00628834818463 },
   { id: 'saraswati-temple', name: 'Saraswati Temple', lat: 21.101862982198668, lng: 79.00590154936697 },
   { id: 'mechanical-ground', name: 'Mechanical Ground', lat: 21.101611730007008, lng: 79.00906472024741 },
+  { id: 'it-garden', name: 'IT Garden', lat: 21.10189072362425, lng: 79.00661863445288 },
+  // Parking locations
+  { id: 'parking-fy', name: 'FY Building Parking', lat: 21.103450, lng: 79.005650 },
+  { id: 'parking-it', name: 'IT Building Parking', lat: 21.101450, lng: 79.006500 },
+  { id: 'parking-mechanical', name: 'Mechanical/Admin Parking', lat: 21.101750, lng: 79.009100 },
+  { id: 'parking-architecture', name: 'Architecture Parking', lat: 21.101150, lng: 79.013200 },
+  { id: 'parking-auditorium', name: 'Auditorium Parking', lat: 21.099500, lng: 79.014700 },
+  { id: 'parking-mba', name: 'BBA/MBA Parking', lat: 21.102150, lng: 79.008250 },
+  { id: 'parking-aero', name: 'AERO/ETC/EC Parking', lat: 21.102350, lng: 79.007550 },
+  { id: 'parking-aids', name: 'AIDS Building Parking', lat: 21.101750, lng: 79.007700 },
+  { id: 'parking-chemical', name: 'Chemical/BioTech Parking', lat: 21.099400, lng: 79.015800 },
 ];
 
 // Calculate haversine distance between two points in meters
