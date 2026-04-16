@@ -110,10 +110,10 @@ export const campusPaths: PathEdge[] = [
   
   // Library Road
   { from: 'road-14', to: 'road-16', distance: 55 },
-  { from: 'road-16', to: 'aids-iot-robotics', distance: 25 },
+  { from: 'road-16', to: 'aids', distance: 25 },
   { from: 'road-16', to: 'road-17', distance: 45 },
   { from: 'road-17', to: 'library', distance: 25 },
-  { from: 'road-17', to: 'aids-iot-robotics', distance: 30 },
+  { from: 'road-17', to: 'aids', distance: 30 },
   
   // Main Canteen Road
   { from: 'road-16', to: 'road-18', distance: 45 },
