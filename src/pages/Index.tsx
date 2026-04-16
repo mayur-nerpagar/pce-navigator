@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { CampusMap } from '@/components/CampusMap';
 import { SearchPanel } from '@/components/SearchPanel';
+import { MapFilters } from '@/components/MapFilters';
 import { DirectionsSheet } from '@/components/DirectionsSheet';
 import { findShortestPath, findPathFromPosition, RouteResult } from '@/utils/dijkstra';
 import { CampusLocation, campusLocations } from '@/data/campusLocations';
@@ -17,6 +18,7 @@ const Index = () => {
   const [isNavigating, setIsNavigating] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [gpsEnabled, setGpsEnabled] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<CampusLocation['category'][]>([]);
   const { toast } = useToast();
   const lastRerouteRef = useRef<number>(0);
 
