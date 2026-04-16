@@ -1,73 +1,104 @@
-# Welcome to your Lovable project
+# PCE Navigator
 
-## Project info
+### Smart Campus Navigation & Information System
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+PCE Navigator is a **smart web-based campus navigation platform** designed to help students, faculty, and visitors easily locate important places inside the college campus such as departments, laboratories, administrative offices, library, classrooms, and other facilities.
 
-## How can I edit this code?
+This project aims to improve campus accessibility by providing **interactive route guidance, department-wise navigation, and a user-friendly responsive interface**.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🚀 Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+* 🗺️ Interactive campus navigation
+* 🏫 Department-wise route directions
+* 📍 Building locator (Library, Admin Block, Mechanical, etc.)
+* 🧭 Shortest path / direction assistance
+* 📱 Fully responsive UI
+* 🎨 Clean modern interface using shadcn/ui
+* ⚡ Fast performance with Vite
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🛠️ Tech Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+This project is built using:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+* **React**
+* **TypeScript**
+* **Vite**
+* **Tailwind CSS**
+* **shadcn/ui**
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📂 Project Structure
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```text
+src/
+ ├── components/
+ ├── pages/
+ ├── data/
+ ├── hooks/
+ ├── utils/
+ └── App.tsx
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## ⚙️ Installation & Setup
+
+Follow these steps to run the project locally:
+
+```bash
+# Clone the repository
+git clone https://github.com/mayur-nerpagar/pce-navigator.git
+
+# Navigate into project folder
+cd pce-navigator
+
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🌐 Live Preview
 
-**Use GitHub Codespaces**
+You can deploy this project using:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+* **Vercel**
+* **Netlify**
+* **GitHub Pages**
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🎯 Project Objective
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The main objective of this project is to help users quickly find routes and directions to important campus locations, reducing confusion and improving accessibility within the college premises.
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 🔮 Future Enhancements
 
-## Can I connect a custom domain to my Lovable project?
+* Real-time GPS-based indoor navigation
+* Voice-guided directions
+* Search and filter locations
+* AI chatbot for campus assistance
+* Faculty and classroom directory
+* Event / notice board integration
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 👨‍💻 Developed By
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+**Mayur Nerpagar**
+Final Year Project
+Frontend Developer | React Developer
+
+GitHub: https://github.com/mayur-nerpagar
+
+---
