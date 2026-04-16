@@ -13,6 +13,7 @@ interface CampusMapProps {
   isNavigating?: boolean;
   userLocation?: GeolocationState;
   onRecenter?: () => void;
+  activeFilters?: CampusLocation['category'][];
 }
 
 // Custom marker icons like Google Maps
