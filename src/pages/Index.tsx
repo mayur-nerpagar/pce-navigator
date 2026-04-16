@@ -118,6 +118,15 @@ const Index = () => {
     setIsNavigating(false);
   }, []);
 
+  const handleToggleFilter = useCallback((category: CampusLocation['category']) => {
+    setActiveFilters(prev => {
+      if (prev.includes(category)) {
+        return prev.filter(c => c !== category);
+      }
+      return [...prev, category];
+    });
+  }, []);
+
   const handleToggleGps = useCallback(() => {
     setGpsEnabled(prev => !prev);
     if (!gpsEnabled) {
