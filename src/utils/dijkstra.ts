@@ -348,18 +348,18 @@ function generateDirections(
   endLocationId: string
 ): DirectionStep[] {
   const directions: DirectionStep[] = [];
-  
+
   if (coordinates.length < 2) return directions;
-  
+
   // Starting instruction
   const startLoc = geoJsonLocations.find(l => l.id === startLocationId);
   const endLoc = geoJsonLocations.find(l => l.id === endLocationId);
-  
+
   const firstBearing = calculateBearing(
     coordinates[0].lat, coordinates[0].lng,
     coordinates[1].lat, coordinates[1].lng
   );
-  
+
   directions.push({
     instruction: `Start from ${startLoc?.name || 'your location'} and head ${getDirectionWord(firstBearing)}`,
     distance: 0,
@@ -367,58 +367,74 @@ function generateDirections(
     toLocation: 'Route',
     coordinates: coordinates[0],
   });
-  
-  // Simplify: group segments and detect significant turns
+
+  // Generate directions with better granularity
   let prevBearing = firstBearing;
   let accumulatedDistance = 0;
-  
+  let lastDirectionIndex = 0;
+
   for (let i = 1; i < coordinates.length - 1; i++) {
     const current = coordinates[i];
     const next = coordinates[i + 1];
-    
+
     const segmentDistance = haversineDistance(current.lat, current.lng, next.lat, next.lng);
     const newBearing = calculateBearing(current.lat, current.lng, next.lat, next.lng);
-    
+
     let bearingDiff = Math.abs(newBearing - prevBearing);
     if (bearingDiff > 180) bearingDiff = 360 - bearingDiff;
-    
+
     accumulatedDistance += segmentDistance;
-    
-    // Only create a direction step for significant turns (>30 degrees)
-    if (bearingDiff > 30) {
+
+    // Create direction for significant turns (>15 degrees) or every 50 meters
+    const shouldCreateDirection = bearingDiff > 15 || accumulatedDistance > 50;
+
+    if (shouldCreateDirection) {
       const turnDirection = getTurnDirection(prevBearing, newBearing);
-      
-      directions.push({
-        instruction: `${turnDirection} and continue ${getDirectionWord(newBearing)}`,
-        distance: Math.round(accumulatedDistance),
-        fromLocation: 'Route',
-        toLocation: 'Route',
-        coordinates: current,
-      });
-      
+
+      // If it's a significant turn, use turn instruction
+      if (bearingDiff > 15) {
+        directions.push({
+          instruction: `${turnDirection} and continue ${getDirectionWord(newBearing)}`,
+          distance: Math.round(accumulatedDistance),
+          fromLocation: 'Route',
+          toLocation: 'Route',
+          coordinates: current,
+        });
+      } else {
+        // For straight segments, add "Continue straight" instruction
+        directions.push({
+          instruction: `Continue straight ${getDirectionWord(newBearing)}`,
+          distance: Math.round(accumulatedDistance),
+          fromLocation: 'Route',
+          toLocation: 'Route',
+          coordinates: current,
+        });
+      }
+
       accumulatedDistance = 0;
+      lastDirectionIndex = i;
     }
-    
+
     prevBearing = newBearing;
   }
-  
+
   // Final arrival instruction
-  const totalDistance = coordinates.reduce((sum, coord, i) => {
+  const remainingDistance = coordinates.slice(lastDirectionIndex + 1).reduce((sum, coord, i, arr) => {
     if (i === 0) return 0;
     return sum + haversineDistance(
-      coordinates[i - 1].lat, coordinates[i - 1].lng,
+      arr[i - 1].lat, arr[i - 1].lng,
       coord.lat, coord.lng
     );
   }, 0);
-  
+
   directions.push({
     instruction: `Arrive at ${endLoc?.name || 'your destination'}`,
-    distance: Math.round(totalDistance),
+    distance: Math.round(remainingDistance),
     fromLocation: 'Route',
     toLocation: endLoc?.name || 'Destination',
     coordinates: coordinates[coordinates.length - 1],
   });
-  
+
   return directions;
 }
 
@@ -427,16 +443,16 @@ function generateDirectionsFromPosition(
   endLocationId: string
 ): DirectionStep[] {
   const directions: DirectionStep[] = [];
-  
+
   if (coordinates.length < 2) return directions;
-  
+
   const endLoc = geoJsonLocations.find(l => l.id === endLocationId);
-  
+
   const firstBearing = calculateBearing(
     coordinates[0].lat, coordinates[0].lng,
     coordinates[1].lat, coordinates[1].lng
   );
-  
+
   directions.push({
     instruction: `Head ${getDirectionWord(firstBearing)} towards ${endLoc?.name || 'destination'}`,
     distance: 0,
@@ -444,53 +460,73 @@ function generateDirectionsFromPosition(
     toLocation: 'Route',
     coordinates: coordinates[0],
   });
-  
-  // Add turn directions for significant bearing changes
+
+  // Generate directions with better granularity
   let prevBearing = firstBearing;
-  
+  let accumulatedDistance = 0;
+  let lastDirectionIndex = 0;
+
   for (let i = 1; i < coordinates.length - 1; i++) {
     const current = coordinates[i];
     const next = coordinates[i + 1];
-    
+
+    const segmentDistance = haversineDistance(current.lat, current.lng, next.lat, next.lng);
     const newBearing = calculateBearing(current.lat, current.lng, next.lat, next.lng);
-    
+
     let bearingDiff = Math.abs(newBearing - prevBearing);
     if (bearingDiff > 180) bearingDiff = 360 - bearingDiff;
-    
-    if (bearingDiff > 30) {
+
+    accumulatedDistance += segmentDistance;
+
+    // Create direction for significant turns (>15 degrees) or every 50 meters
+    const shouldCreateDirection = bearingDiff > 15 || accumulatedDistance > 50;
+
+    if (shouldCreateDirection) {
       const turnDirection = getTurnDirection(prevBearing, newBearing);
-      const distance = haversineDistance(
-        coordinates[i - 1].lat, coordinates[i - 1].lng,
-        current.lat, current.lng
-      );
-      
-      directions.push({
-        instruction: turnDirection,
-        distance: Math.round(distance),
-        fromLocation: 'Route',
-        toLocation: 'Route',
-        coordinates: current,
-      });
+
+      // If it's a significant turn, use turn instruction
+      if (bearingDiff > 15) {
+        directions.push({
+          instruction: `${turnDirection} and continue ${getDirectionWord(newBearing)}`,
+          distance: Math.round(accumulatedDistance),
+          fromLocation: 'Route',
+          toLocation: 'Route',
+          coordinates: current,
+        });
+      } else {
+        // For straight segments, add "Continue straight" instruction
+        directions.push({
+          instruction: `Continue straight ${getDirectionWord(newBearing)}`,
+          distance: Math.round(accumulatedDistance),
+          fromLocation: 'Route',
+          toLocation: 'Route',
+          coordinates: current,
+        });
+      }
+
+      accumulatedDistance = 0;
+      lastDirectionIndex = i;
     }
-    
+
     prevBearing = newBearing;
   }
-  
-  const totalDistance = coordinates.reduce((sum, coord, i) => {
+
+  // Final arrival instruction
+  const remainingDistance = coordinates.slice(lastDirectionIndex + 1).reduce((sum, coord, i, arr) => {
     if (i === 0) return 0;
     return sum + haversineDistance(
-      coordinates[i - 1].lat, coordinates[i - 1].lng,
+      arr[i - 1].lat, arr[i - 1].lng,
       coord.lat, coord.lng
     );
   }, 0);
-  
+
   directions.push({
     instruction: `Arrive at ${endLoc?.name || 'destination'}`,
-    distance: Math.round(totalDistance),
+    distance: Math.round(remainingDistance),
     fromLocation: 'Route',
     toLocation: endLoc?.name || 'Destination',
     coordinates: coordinates[coordinates.length - 1],
   });
-  
+
   return directions;
 }

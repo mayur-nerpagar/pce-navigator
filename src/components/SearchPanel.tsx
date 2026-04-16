@@ -69,65 +69,51 @@ export function SearchPanel({
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="absolute top-4 left-4 right-4 md:right-auto md:w-[400px] z-[1000]"
+        className="absolute top-4 left-4 right-4 md:right-auto md:w-[420px] z-[1000]"
       >
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div className="bg-white/95 border border-slate-200 shadow-2xl rounded-[32px] overflow-hidden backdrop-blur-xl">
           {/* Header with inputs */}
-          <div className="p-3">
-            {/* Source Input */}
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-6 flex justify-center">
-                <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-blue-200"></div>
+          <div className="p-5 pb-4">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">Campus Navigator</p>
+                <h2 className="mt-2 text-2xl font-semibold text-slate-950">Find the best route</h2>
               </div>
               <button
-                onClick={() => { setActiveInput('source'); onExpandedChange(true); }}
-                className="flex-1 text-left px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors text-sm"
+                onClick={onClear}
+                className="px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
               >
-                {sourceName || <span className="text-gray-500">Choose starting point</span>}
+                Reset
               </button>
-              {sourceId && (
-                <button onClick={() => onSourceChange('')} className="p-1 hover:bg-gray-100 rounded">
-                  <X className="w-4 h-4 text-gray-400" />
+            </div>
+
+            <div className="space-y-3">
+              <div className="rounded-[20px] border border-slate-200 bg-slate-50 p-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-5 h-5 rounded-full bg-blue-500" />
+                  <span className="text-sm font-medium text-slate-900">Starting point</span>
+                </div>
+                <button
+                  onClick={() => { setActiveInput('source'); onExpandedChange(true); }}
+                  className="w-full text-left rounded-2xl bg-white px-4 py-3 text-sm text-slate-700 shadow-sm hover:bg-slate-100 transition-colors"
+                >
+                  {sourceName || 'Choose starting point'}
                 </button>
-              )}
-            </div>
-
-            {/* Connecting line */}
-            <div className="flex items-center gap-3">
-              <div className="w-6 flex justify-center">
-                <div className="w-0.5 h-4 bg-gray-300"></div>
               </div>
-            </div>
 
-            {/* Destination Input */}
-            <div className="flex items-center gap-3 mt-2">
-              <div className="w-6 flex justify-center">
-                <div className="w-3 h-3 rounded-full bg-red-500 border-2 border-red-200"></div>
-              </div>
-              <button
-                onClick={() => { setActiveInput('destination'); onExpandedChange(true); }}
-                className="flex-1 text-left px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors text-sm"
-              >
-                {destName || <span className="text-gray-500">Choose destination</span>}
-              </button>
-              {destinationId && (
-                <button onClick={() => onDestinationChange('')} className="p-1 hover:bg-gray-100 rounded">
-                  <X className="w-4 h-4 text-gray-400" />
+              <div className="rounded-[20px] border border-slate-200 bg-slate-50 p-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-5 h-5 rounded-full bg-red-500" />
+                  <span className="text-sm font-medium text-slate-900">Destination</span>
+                </div>
+                <button
+                  onClick={() => { setActiveInput('destination'); onExpandedChange(true); }}
+                  className="w-full text-left rounded-2xl bg-white px-4 py-3 text-sm text-slate-700 shadow-sm hover:bg-slate-100 transition-colors"
+                >
+                  {destName || 'Choose destination'}
                 </button>
-              )}
+              </div>
             </div>
-
-            {/* Swap button */}
-            {(sourceId || destinationId) && (
-              <button
-                onClick={onSwap}
-                className="absolute right-14 top-1/2 -translate-y-1/2 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-              >
-                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                </svg>
-              </button>
-            )}
           </div>
 
           {/* Route Info - shows when route is calculated */}
@@ -137,23 +123,24 @@ export function SearchPanel({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="border-t border-gray-200"
+                className="border-t border-slate-200 bg-slate-50"
               >
-                <div className="p-4 bg-blue-50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 text-blue-700">
-                        <Clock className="w-5 h-5" />
-                        <span className="font-semibold text-lg">{estimatedTime} min</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Route className="w-4 h-4" />
-                        <span className="text-sm">{route.totalDistance}m</span>
+                <div className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Route summary</div>
+                      <div className="flex flex-wrap gap-3">
+                        <div className="rounded-2xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white">
+                          {estimatedTime} min
+                        </div>
+                        <div className="rounded-2xl bg-white px-3 py-2 text-sm text-slate-700 shadow-sm">
+                          {route.totalDistance} m
+                        </div>
                       </div>
                     </div>
                     <button
                       onClick={onNavigate}
-                      className="px-6 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-colors shadow-md"
+                      className="rounded-2xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
                     >
                       Start
                     </button>

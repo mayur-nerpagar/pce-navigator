@@ -4,11 +4,12 @@ import { CampusMap } from '@/components/CampusMap';
 import { SearchPanel } from '@/components/SearchPanel';
 import { MapFilters } from '@/components/MapFilters';
 import { DirectionsSheet } from '@/components/DirectionsSheet';
+import { HeaderSearch } from '@/components/HeaderSearch';
 import { findShortestPath, findPathFromPosition, RouteResult } from '@/utils/dijkstra';
 import { CampusLocation, campusLocations } from '@/data/campusLocations';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useToast } from '@/hooks/use-toast';
-import { Navigation2, MapPin, Loader2 } from 'lucide-react';
+import { Navigation2, MapPin, Loader2, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
@@ -19,6 +20,7 @@ const Index = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [gpsEnabled, setGpsEnabled] = useState(false);
   const [activeFilters, setActiveFilters] = useState<CampusLocation['category'][]>([]);
+  const [showPanels, setShowPanels] = useState(true);
   const { toast } = useToast();
   const lastRerouteRef = useRef<number>(0);
 
@@ -30,8 +32,10 @@ const Index = () => {
     if (sourceId && destinationId && sourceId !== destinationId) {
       const result = findShortestPath(sourceId, destinationId);
       setRoute(result);
+      setShowPanels(false); // Hide panels when route is calculated
     } else {
       setRoute(null);
+      setShowPanels(true); // Show panels when route is cleared
     }
   }, [sourceId, destinationId]);
 
@@ -105,6 +109,7 @@ const Index = () => {
   const handleStartNavigation = useCallback(() => {
     setIsNavigating(true);
     setGpsEnabled(true); // Enable GPS when navigation starts
+    setShowPanels(false); // Hide panels when navigation starts
     toast({
       title: "Navigation started",
       description: "Follow the blue route. GPS tracking enabled.",
@@ -116,6 +121,7 @@ const Index = () => {
     setDestinationId('');
     setRoute(null);
     setIsNavigating(false);
+    setShowPanels(true); // Show panels when route is cleared
   }, []);
 
   const handleToggleFilter = useCallback((category: CampusLocation['category']) => {
@@ -183,6 +189,24 @@ const Index = () => {
     }
   }, [userLocation, toast]);
 
+  // Handle header search location selection (update destination during navigation)
+  const handleHeaderSearchSelect = useCallback((location: CampusLocation) => {
+    if (location.id === sourceId) {
+      toast({
+        title: "Invalid selection",
+        description: "Choose a different location than your starting point.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setDestinationId(location.id);
+    toast({
+      title: "New destination set",
+      description: location.name,
+    });
+  }, [sourceId, toast]);
+
   return (
     <div className="fixed inset-0 overflow-hidden">
       {/* Full Screen Satellite Map */}
@@ -198,25 +222,59 @@ const Index = () => {
         />
       </div>
 
-      {/* Category Filters */}
-      <MapFilters activeFilters={activeFilters} onToggleFilter={handleToggleFilter} />
+      {/* Header Search Bar - Visible during navigation */}
+      <AnimatePresence>
+        {isNavigating && (
+          <HeaderSearch
+            onLocationSelect={handleHeaderSearchSelect}
+            currentDestination={destinationId}
+            isOpen={false}
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Search Panel - Google Maps style floating card */}
-      <SearchPanel
-        sourceId={sourceId}
-        destinationId={destinationId}
-        onSourceChange={setSourceId}
-        onDestinationChange={setDestinationId}
-        onSwap={handleSwapLocations}
-        onNavigate={handleStartNavigation}
-        onClear={handleClearRoute}
-        route={route}
-        isExpanded={isSearchExpanded}
-        onExpandedChange={setIsSearchExpanded}
-        onUseMyLocation={handleUseMyLocation}
-        gpsEnabled={gpsEnabled}
-        userLocation={userLocation}
-      />
+      {/* Category Filters - Hidden during navigation */}
+      <AnimatePresence>
+        {showPanels && (
+          <MapFilters activeFilters={activeFilters} onToggleFilter={handleToggleFilter} />
+        )}
+      </AnimatePresence>
+
+      {/* Search Panel - Hidden during navigation */}
+      <AnimatePresence>
+        {showPanels && (
+          <SearchPanel
+            sourceId={sourceId}
+            destinationId={destinationId}
+            onSourceChange={setSourceId}
+            onDestinationChange={setDestinationId}
+            onSwap={handleSwapLocations}
+            onNavigate={handleStartNavigation}
+            onClear={handleClearRoute}
+            route={route}
+            isExpanded={isSearchExpanded}
+            onExpandedChange={setIsSearchExpanded}
+            onUseMyLocation={handleUseMyLocation}
+            gpsEnabled={gpsEnabled}
+            userLocation={userLocation}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Restore Panels Button - Visible when navigating */}
+      <AnimatePresence>
+        {!showPanels && route && (
+          <div className="absolute top-4 left-4 z-[700] md:hidden">
+            <button
+              onClick={() => setShowPanels(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-white/95 border border-slate-200 rounded-full text-sm font-medium shadow-lg hover:bg-white transition-colors"
+            >
+              <ChevronUp className="w-4 h-4" />
+              Show route options
+            </button>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* GPS Toggle Button */}
       <div className="absolute top-4 right-4 z-[600]">
@@ -270,15 +328,17 @@ const Index = () => {
       </AnimatePresence>
 
       {/* College Branding - Bottom Left */}
-      <div className="absolute bottom-4 left-4 z-[500] bg-card/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-border">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-primary" />
-          <div>
-            <div className="text-xs font-bold text-foreground">PCE Nagpur</div>
-            <div className="text-[10px] text-muted-foreground">Campus Navigator</div>
+      {showPanels && (
+        <div className="absolute bottom-4 left-4 z-[500] bg-card/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-border">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-primary" />
+            <div>
+              <div className="text-xs font-bold text-foreground">PCE Nagpur</div>
+              <div className="text-[10px] text-muted-foreground">Campus Navigator</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

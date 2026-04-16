@@ -118,6 +118,30 @@ export const roadSegments: RoadSegment[] = [
       { lng: 79.00851518154428, lat: 21.101862981402178 },
     ],
   },
+  // Connector from MBA/BBA branch to mechanical road network
+  {
+    id: 'road-mba-connector-2',
+    coordinates: [
+      { lng: 79.0097247067489, lat: 21.101517157201783 },
+      { lng: 79.0096915679602, lat: 21.10151028331353 },
+    ],
+  },
+  // Connector from MBA/BBA branch into library/main campus road network
+  {
+    id: 'road-mba-connector-1',
+    coordinates: [
+      { lng: 79.00851518154428, lat: 21.101862981402178 },
+      { lng: 79.00855763412471, lat: 21.101442696480177 },
+    ],
+  },
+  // Library direct connector to aids/main campus road network
+  {
+    id: 'road-library-4',
+    coordinates: [
+      { lng: 79.00785305084935, lat: 21.101401228988507 },
+      { lng: 79.00783855538316, lat: 21.10166163218834 },
+    ],
+  },
   // Vertical road near library
   {
     id: 'road-library-1',
