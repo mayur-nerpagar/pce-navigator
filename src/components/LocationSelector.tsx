@@ -36,10 +36,12 @@ export function LocationSelector({ value, onChange, placeholder, icon }: Locatio
     const groups: Record<CampusLocation['category'], CampusLocation[]> = {
       gate: [],
       academic: [],
-      amenity: [],
+      food: [],
       recreation: [],
       religious: [],
       admin: [],
+      parking: [],
+      facility: [],
     };
     
     campusLocations.forEach(loc => {
