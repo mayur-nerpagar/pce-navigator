@@ -194,8 +194,12 @@ const Index = () => {
           onLocationClick={handleLocationClick}
           isNavigating={isNavigating}
           userLocation={gpsEnabled ? userLocation : undefined}
+          activeFilters={activeFilters}
         />
       </div>
+
+      {/* Category Filters */}
+      <MapFilters activeFilters={activeFilters} onToggleFilter={handleToggleFilter} />
 
       {/* Search Panel - Google Maps style floating card */}
       <SearchPanel
