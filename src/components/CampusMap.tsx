@@ -107,7 +107,7 @@ const createUserLocationMarker = () => {
   });
 };
 
-export function CampusMap({ route, sourceId, destinationId, onLocationClick, isNavigating, userLocation }: CampusMapProps) {
+export function CampusMap({ route, sourceId, destinationId, onLocationClick, isNavigating, userLocation, activeFilters = [] }: CampusMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
