@@ -247,8 +247,13 @@ export function CampusMap({ route, sourceId, destinationId, onLocationClick, isN
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    // Add markers for each location
-    campusLocations.forEach(location => {
+    // Filter locations based on active filters
+    const visibleLocations = activeFilters.length === 0 
+      ? campusLocations 
+      : campusLocations.filter(loc => activeFilters.includes(loc.category));
+
+    // Add markers for each visible location
+    visibleLocations.forEach(location => {
       const isSource = location.id === sourceId;
       const isDestination = location.id === destinationId;
       
